@@ -1,123 +1,245 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { NAV_LINKS, SITE } from "@/lib/site";
+import { EASE, useCalm } from "@/components/ui/motion";
 
-function InstagramIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <path d="M16 11.37a4 4 0 1 1-7.914 1.174 4 4 0 0 1 7.914-1.174z" />
-      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-    </svg>
-  );
-}
+/**
+ * Transparent premium navigation. Condenses on scroll into a floating
+ * blurred plate, hides when scrolling down and returns on scroll up, and
+ * tracks the section currently in view. The mobile panel is a full-height
+ * sheet with staggered links, not a shrunken desktop menu.
+ */
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const calm = useCalm();
+  const { scrollY } = useScroll();
+  const [condensed, setCondensed] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState<string>("#top");
+  const [progress, setProgress] = useState(0);
 
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const prev = scrollY.getPrevious() ?? 0;
+    setCondensed(y > 60);
+    setHidden(y > 420 && y > prev && !open);
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    setProgress(max > 0 ? y / max : 0);
+  });
+
+  /* Track the section in view for the active link underline. */
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const ids = NAV_LINKS.map((l) => l.href.replace("#", ""));
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    if (!els.length) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActive(`#${visible.target.id}`);
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.15, 0.5] }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
   }, []);
 
-  const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Our Story", href: "#story" },
-    { name: "Menu", href: "#menu" },
-    { name: "Experience", href: "#experience" },
-    { name: "Gallery", href: "#gallery" },
-    { name: "Reviews", href: "#reviews" },
-    { name: "Visit Us", href: "#visit" },
-  ];
+  /* Lock scroll behind the mobile sheet. */
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 border-b border-white/5 ${
-          scrolled ? "bg-black/60 backdrop-blur-md py-4" : "bg-transparent py-6"
-        }`}
+      <a href="#story" className="skip-link">
+        Skip to content
+      </a>
+
+      <motion.header
+        initial={{ y: -90, opacity: 0 }}
+        animate={{ y: hidden ? -110 : 0, opacity: 1 }}
+        transition={{ duration: calm ? 0.2 : 0.7, ease: EASE }}
+        className="fixed inset-x-0 top-0 z-[70]"
       >
-        <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
-          {/* Logo */}
-          <div className="flex flex-col">
-            <span className="text-xl md:text-2xl font-bold tracking-widest text-cream">AMAIA'S</span>
-            <span className="text-[10px] md:text-xs text-cream/70 tracking-[0.2em] font-light">COFFEE HOUSE</span>
-          </div>
-
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium text-cream/80 hover:text-cream transition-colors relative group"
+        <div
+          className={`transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            condensed
+              ? "border-b border-linen/[0.08] bg-ink/70 backdrop-blur-xl backdrop-saturate-150"
+              : "border-b border-transparent bg-transparent"
+          }`}
+        >
+          <div
+            className={`mx-auto flex max-w-[1400px] items-center justify-between px-6 transition-all duration-700 md:px-12 ${
+              condensed ? "py-3.5" : "py-6"
+            }`}
+          >
+            {/* brand */}
+            <a href="#top" className="group flex flex-col leading-none" aria-label="Amaia's Coffee House, home">
+              <span
+                className={`font-display tracking-[0.16em] text-cream transition-all duration-700 ${
+                  condensed ? "text-base md:text-lg" : "text-lg md:text-xl"
+                }`}
               >
-                {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-cream transition-all duration-300 group-hover:w-full"></span>
-              </a>
-            ))}
-          </div>
-
-          {/* Right Actions */}
-          <div className="hidden md:flex items-center space-x-6">
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-cream/80 hover:text-cream transition-colors">
-              <InstagramIcon className="w-5 h-5" />
+                {SITE.nameShort}
+              </span>
+              <span className="mt-1 flex items-center gap-2 text-[0.55rem] tracking-[0.24em] text-mist/55 transition-colors group-hover:text-linen/70 md:text-[0.6rem]">
+                COFFEE HOUSE
+                <span className="h-2.5 w-px bg-linen/20" />
+                <span className="font-kannada tracking-normal">{SITE.nameKannada}</span>
+              </span>
             </a>
-            <button className="px-6 py-2 bg-cream text-dark font-medium rounded-full hover:bg-beige transition-colors shadow-[0_0_15px_rgba(245,240,235,0.15)]">
-              Visit Amaia's
-            </button>
-          </div>
 
-          {/* Mobile Menu Toggle */}
-          <button 
-            className="md:hidden text-cream"
-            onClick={() => setMobileMenuOpen(true)}
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-        </div>
-      </motion.nav>
-
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: "100%" }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: "100%" }}
-            transition={{ duration: 0.4, ease: "easeInOut" }}
-            className="fixed inset-0 z-[60] bg-dark/95 backdrop-blur-xl flex flex-col justify-center items-center"
-          >
-            <button 
-              className="absolute top-8 right-8 text-cream"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <X className="w-8 h-8" />
-            </button>
-            <div className="flex flex-col items-center space-y-8 text-2xl font-light">
-              {navLinks.map((link) => (
+            {/* desktop links */}
+            <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
+              {NAV_LINKS.map((l) => (
                 <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-cream hover:text-beige transition-colors"
+                  key={l.label}
+                  href={l.href}
+                  className="group relative py-1 text-[0.82rem] text-linen/70 transition-colors hover:text-cream"
+                  aria-current={active === l.href ? "page" : undefined}
                 >
-                  {link.name}
+                  {l.label}
+                  <span
+                    className={`absolute -bottom-0.5 left-0 h-px bg-caramel transition-all duration-500 ${
+                      active === l.href ? "w-full" : "w-0 group-hover:w-full"
+                    }`}
+                  />
                 </a>
               ))}
-              <div className="h-px w-16 bg-white/20 my-4"></div>
-              <button className="px-8 py-3 bg-cream text-dark font-medium rounded-full text-lg">
-                Visit Amaia's
+            </nav>
+
+            <div className="flex items-center gap-3">
+              <a
+                href="#visit"
+                className="hidden rounded-full bg-cream px-6 py-2.5 text-[0.8rem] font-medium text-ink transition-transform duration-500 hover:scale-105 sm:block"
+              >
+                Visit Us
+              </a>
+
+              {/* mobile toggle */}
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="grid h-10 w-10 place-items-center rounded-full border border-linen/15 text-cream transition-colors hover:border-linen/40 lg:hidden"
+                aria-label="Open menu"
+                aria-expanded={open}
+              >
+                <span className="flex flex-col gap-[5px]">
+                  <span className="block h-px w-4 bg-current" />
+                  <span className="block h-px w-4 bg-current" />
+                </span>
               </button>
+            </div>
+          </div>
+        </div>
+
+        {/* reading progress */}
+        <div className="h-px w-full bg-transparent">
+          <div
+            className="h-px origin-left bg-gradient-to-r from-caramel via-amber to-caramel transition-transform duration-150"
+            style={{ transform: `scaleX(${progress})` }}
+          />
+        </div>
+      </motion.header>
+
+      {/* ---------- mobile sheet ---------- */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="fixed inset-0 z-[80] lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+          >
+            <motion.div
+              className="absolute inset-0 bg-espresso"
+              initial={calm ? { opacity: 0 } : { clipPath: "inset(0% 0% 100% 0%)" }}
+              animate={{ opacity: 1, clipPath: "inset(0% 0% 0% 0%)" }}
+              exit={calm ? { opacity: 0 } : { clipPath: "inset(0% 0% 100% 0%)" }}
+              transition={{ duration: calm ? 0.2 : 0.7, ease: EASE }}
+            />
+
+            <div className="relative flex h-full flex-col px-6 pb-10 pt-6">
+              <div className="flex items-center justify-between">
+                <span className="font-display text-lg tracking-[0.16em] text-cream">
+                  {SITE.nameShort}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  className="grid h-10 w-10 place-items-center rounded-full border border-linen/20 text-cream"
+                  aria-label="Close menu"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M5 5l14 14M19 5L5 19" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+
+              <nav className="mt-auto" aria-label="Mobile">
+                <ul>
+                  {NAV_LINKS.map((l, i) => (
+                    <li key={l.label} className="overflow-hidden border-b border-linen/[0.08]">
+                      <motion.a
+                        href={l.href}
+                        onClick={() => setOpen(false)}
+                        className="flex items-baseline gap-4 py-4 font-display text-3xl text-cream"
+                        initial={calm ? { opacity: 0 } : { y: "110%", opacity: 0 }}
+                        animate={{ y: "0%", opacity: 1 }}
+                        transition={{ duration: calm ? 0.2 : 0.8, delay: 0.16 + i * 0.055, ease: EASE }}
+                      >
+                        <span className="font-mono text-[0.6rem] text-caramel/70">
+                          0{i + 1}
+                        </span>
+                        {l.label}
+                      </motion.a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              <motion.div
+                className="mt-8 flex flex-col gap-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.55, ease: EASE }}
+              >
+                <a
+                  href={SITE.directions}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                  className="rounded-full bg-cream px-8 py-4 text-center text-sm font-medium text-ink"
+                >
+                  Get Directions
+                </a>
+                <a
+                  href={SITE.phoneHref}
+                  className="rounded-full border border-linen/25 px-8 py-4 text-center text-sm font-medium text-cream"
+                >
+                  Call {SITE.phone}
+                </a>
+                <p className="mt-3 text-center text-xs text-mist/45">{SITE.hours}</p>
+              </motion.div>
             </div>
           </motion.div>
         )}

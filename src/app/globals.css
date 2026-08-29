@@ -1,59 +1,309 @@
 @import "tailwindcss";
 
-@theme {
-  --color-espresso: #2C1810;
-  --color-coffee: #4A3219;
-  --color-cream: #F5F0EB;
-  --color-beige: #E6DCD3;
-  --color-forest: #2A3B24;
-  --color-sage: #8A9A86;
-  --color-dark: #121212;
+/* ============================================================
+   AMAIA'S COFFEE HOUSE — design tokens
+   Warm Indian coffee culture x Scandinavian restraint.
+   ============================================================ */
 
-  --color-background: var(--color-dark);
+@theme {
+  /* Ground */
+  --color-ink: #0a0706;
+  --color-espresso: #14100d;
+  --color-bean: #1d1713;
+  --color-roast: #33241a;
+  --color-clay: #533a28;
+
+  /* Warmth / accent */
+  --color-caramel: #c08a4e;
+  --color-amber: #e0aa6b;
+  --color-ember: #a5643a;
+
+  /* Light */
+  --color-cream: #f6f1e8;
+  --color-linen: #e3d8c8;
+  --color-mist: #b6a996;
+
+  /* Green escape */
+  --color-moss: #3a4a34;
+  --color-sage: #8d9d84;
+  --color-fern: #5f7454;
+
+  --color-background: var(--color-ink);
   --color-foreground: var(--color-cream);
-  
-  --font-sans: "Inter", var(--font-geist-sans), sans-serif;
+
+  --font-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-kannada: var(--font-kannada), var(--font-inter), sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-:root {
-  --background: #121212;
-  --foreground: #F5F0EB;
+/* ---------- Base ---------- */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-ink);
+  color: var(--color-cream);
   font-family: var(--font-sans);
-  overflow-x: hidden;
-  scroll-behavior: smooth;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom scrollbar for an elegant look */
+/* Prevent any child from creating a horizontal scrollbar */
+body,
+main {
+  max-width: 100vw;
+}
+
+::selection {
+  background: var(--color-caramel);
+  color: var(--color-ink);
+}
+
+/* ---------- Focus ---------- */
+
+:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 200;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: top 0.25s var(--ease-out-expo);
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* ---------- Scrollbar ---------- */
+
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 9px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: var(--color-ink);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-coffee);
-  border-radius: 4px;
+  background: var(--color-roast);
+  border-radius: 999px;
+  border: 2px solid var(--color-ink);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-espresso);
+  background: var(--color-clay);
 }
 
-/* Subtle background grain */
-.bg-grain {
-  position: relative;
+/* ---------- Typography helpers ---------- */
+
+.font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 96, "SOFT" 0, "WONK" 1;
+  letter-spacing: -0.025em;
 }
-.bg-grain::before {
+
+.font-kannada {
+  font-family: var(--font-kannada);
+  font-feature-settings: normal;
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-caramel);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Fluid display sizes — no media queries needed */
+.display-xl {
+  font-size: clamp(2.75rem, 9.2vw, 8.5rem);
+  line-height: 0.92;
+}
+.display-lg {
+  font-size: clamp(2.25rem, 6.4vw, 5.5rem);
+  line-height: 0.98;
+}
+.display-md {
+  font-size: clamp(1.75rem, 4.2vw, 3.5rem);
+  line-height: 1.05;
+}
+
+/* ---------- Film grain ---------- */
+
+.grain::after {
   content: "";
   position: absolute;
-  inset: 0;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  inset: -50%;
   pointer-events: none;
-  z-index: 50;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 7s steps(6) infinite;
+  will-change: transform;
+}
+
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  16% { transform: translate(-3%, 2%); }
+  33% { transform: translate(2%, -3%); }
+  50% { transform: translate(-2%, -2%); }
+  66% { transform: translate(3%, 1%); }
+  83% { transform: translate(-1%, 3%); }
+}
+
+/* ---------- Steam ---------- */
+
+.steam-wisp {
+  position: absolute;
+  bottom: 0;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to top,
+    rgba(246, 241, 232, 0) 0%,
+    rgba(246, 241, 232, 0.5) 35%,
+    rgba(246, 241, 232, 0) 100%
+  );
+  filter: blur(6px);
+  opacity: 0;
+  animation: steam-rise var(--steam-dur, 7s) ease-in-out var(--steam-delay, 0s) infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes steam-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scaleX(1) scaleY(0.6);
+  }
+  18% {
+    opacity: var(--steam-peak, 0.5);
+  }
+  55% {
+    transform: translate3d(calc(var(--steam-drift, 14px) * -1), -55%, 0) scaleX(2.4) scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--steam-drift, 14px), -100%, 0) scaleX(4) scaleY(1.3);
+  }
+}
+
+/* ---------- Slow rotation (crema swirl) ---------- */
+
+@keyframes slow-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Ambient light bloom ---------- */
+
+.bloom {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+@keyframes bloom-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(6%, -8%, 0) scale(1.14); }
+  66% { transform: translate3d(-7%, 5%, 0) scale(0.94); }
+}
+
+/* ---------- Falling leaves (Green Escape) ---------- */
+
+@keyframes leaf-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+  }
+  10% { opacity: var(--leaf-op, 0.5); }
+  90% { opacity: var(--leaf-op, 0.5); }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--leaf-x, 60px), 112vh, 0) rotate(var(--leaf-spin, 320deg));
+  }
+}
+
+.leaf {
+  position: absolute;
+  top: 0;
+  will-change: transform, opacity;
+  animation: leaf-fall var(--leaf-dur, 20s) linear var(--leaf-delay, 0s) infinite;
+}
+
+/* ---------- Marquee ---------- */
+
+@keyframes marquee-left {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-left var(--marquee-dur, 42s) linear infinite;
+  will-change: transform;
+}
+
+/* ---------- Utility: mask reveal ---------- */
+
+.mask-fade-b {
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+.mask-fade-x {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.hairline {
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in srgb, var(--color-linen) 26%, transparent),
+    transparent
+  );
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .grain::after,
+  .steam-wisp,
+  .leaf,
+  .marquee-track {
+    animation: none !important;
+  }
+  .steam-wisp { opacity: 0.22; }
+  .leaf { opacity: 0.35; }
 }
