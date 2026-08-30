@@ -148,7 +148,7 @@ export default function Gallery() {
               <p className="eyebrow mb-5">The Gallery</p>
             </Reveal>
             <h2 className="display-lg font-display text-cream">
-              <RevealLines lines={[<>Moments at</>, <><em className="not-italic text-caramel">Amaia&rsquo;s.</em></>]} />
+              <RevealLines lines={[<>Moments at </>, <><em className="not-italic text-caramel">Amaia&rsquo;s.</em></>]} />
             </h2>
           </div>
           <div className="col-span-12 lg:col-span-4 lg:col-start-9">

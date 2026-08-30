@@ -72,7 +72,7 @@ export default function Story() {
             <h2 className="display-lg font-display text-cream">
               <RevealLines
                 lines={[
-                  <>More Than</>,
+                  <>More Than </>,
                   <>
                     Just <em className="not-italic text-caramel">Coffee.</em>
                   </>,

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { NAV_LINKS, SITE } from "@/lib/site";
 import { EASE, useCalm } from "@/components/ui/motion";
+import { LogoMark } from "@/components/ui/Logo";
 
 /**
  * Transparent premium navigation. Condenses on scroll into a floating
@@ -14,20 +15,18 @@ import { EASE, useCalm } from "@/components/ui/motion";
 
 export default function Navbar() {
   const calm = useCalm();
-  const { scrollY } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
   const [condensed, setCondensed] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("#top");
-  const [progress, setProgress] = useState(0);
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const prev = scrollY.getPrevious() ?? 0;
-    setCondensed(y > 60);
-    setHidden(y > 420 && y > prev && !open);
-    const doc = document.documentElement;
-    const max = doc.scrollHeight - doc.clientHeight;
-    setProgress(max > 0 ? y / max : 0);
+    const isCondensed = y > 60;
+    const isHidden = y > 420 && y > prev && !open;
+    setCondensed((c) => (c !== isCondensed ? isCondensed : c));
+    setHidden((h) => (h !== isHidden ? isHidden : h));
   });
 
   /* Track the section in view for the active link underline. */
@@ -89,19 +88,22 @@ export default function Navbar() {
             }`}
           >
             {/* brand */}
-            <a href="#top" className="group flex flex-col leading-none" aria-label="Amaia's Coffee House, home">
-              <span
-                className={`font-display tracking-[0.16em] text-cream transition-all duration-700 ${
-                  condensed ? "text-base md:text-lg" : "text-lg md:text-xl"
-                }`}
-              >
-                {SITE.nameShort}
-              </span>
-              <span className="mt-1 flex items-center gap-2 text-[0.55rem] tracking-[0.24em] text-mist/55 transition-colors group-hover:text-linen/70 md:text-[0.6rem]">
-                COFFEE HOUSE
-                <span className="h-2.5 w-px bg-linen/20" />
-                <span className="font-kannada tracking-normal">{SITE.nameKannada}</span>
-              </span>
+            <a href="#top" className="group flex items-center gap-3 leading-none" aria-label="Amaia's Coffee House, home">
+              <LogoMark className={`transition-all duration-700 ${condensed ? "h-6 w-6" : "h-8 w-8"}`} />
+              <div className="flex flex-col">
+                <span
+                  className={`font-display tracking-[0.16em] text-cream transition-all duration-700 ${
+                    condensed ? "text-base md:text-lg" : "text-lg md:text-xl"
+                  }`}
+                >
+                  {SITE.nameShort}
+                </span>
+                <span className="mt-0.5 flex items-center gap-2 text-[0.55rem] tracking-[0.24em] text-mist/55 transition-colors group-hover:text-linen/70 md:text-[0.6rem]">
+                  COFFEE HOUSE
+                  <span className="h-2.5 w-px bg-linen/20" />
+                  <span className="font-kannada tracking-normal">{SITE.nameKannada}</span>
+                </span>
+              </div>
             </a>
 
             {/* desktop links */}
@@ -124,6 +126,20 @@ export default function Navbar() {
             </nav>
 
             <div className="flex items-center gap-3">
+              <a
+                href={SITE.instagramHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="grid h-10 w-10 place-items-center rounded-full border border-linen/15 text-cream transition-all duration-300 hover:border-amber/50 hover:bg-cream/[0.08] hover:text-amber"
+                aria-label="Follow Amaia's Coffee House on Instagram"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </a>
+
               <a
                 href="#visit"
                 className="hidden rounded-full bg-cream px-6 py-2.5 text-[0.8rem] font-medium text-ink transition-transform duration-500 hover:scale-105 sm:block"
@@ -150,9 +166,9 @@ export default function Navbar() {
 
         {/* reading progress */}
         <div className="h-px w-full bg-transparent">
-          <div
-            className="h-px origin-left bg-gradient-to-r from-caramel via-amber to-caramel transition-transform duration-150"
-            style={{ transform: `scaleX(${progress})` }}
+          <motion.div
+            className="h-px origin-left bg-gradient-to-r from-caramel via-amber to-caramel"
+            style={{ scaleX: scrollYProgress }}
           />
         </div>
       </motion.header>
@@ -228,17 +244,31 @@ export default function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
-                  className="rounded-full bg-cream px-8 py-4 text-center text-sm font-medium text-ink"
+                  className="rounded-full bg-cream px-8 py-3.5 text-center text-sm font-medium text-ink"
                 >
                   Get Directions
                 </a>
                 <a
+                  href={SITE.instagramHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 rounded-full border border-linen/25 px-8 py-3.5 text-center text-sm font-medium text-cream transition-colors hover:border-amber/50 hover:text-amber"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                  </svg>
+                  Instagram {SITE.instagram}
+                </a>
+                <a
                   href={SITE.phoneHref}
-                  className="rounded-full border border-linen/25 px-8 py-4 text-center text-sm font-medium text-cream"
+                  className="rounded-full border border-linen/25 px-8 py-3.5 text-center text-sm font-medium text-cream"
                 >
                   Call {SITE.phone}
                 </a>
-                <p className="mt-3 text-center text-xs text-mist/45">{SITE.hours}</p>
+                <p className="mt-2 text-center text-xs text-mist/45">{SITE.hours}</p>
               </motion.div>
             </div>
           </motion.div>

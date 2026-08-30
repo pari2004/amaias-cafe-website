@@ -179,7 +179,7 @@ export default function GreenEscape() {
 
         <h2 className="display-lg mx-auto max-w-4xl font-display text-cream">
           <RevealLines
-            lines={[<>A Little Escape</>, <>in the <em className="not-italic text-sage">City.</em></>]}
+            lines={[<>A Little Escape </>, <>in the <em className="not-italic text-sage">City.</em></>]}
             stagger={0.14}
           />
         </h2>

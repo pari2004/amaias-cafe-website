@@ -60,6 +60,10 @@ export const metadata: Metadata = {
     title: "Amaia's Coffee House · BTM Layout, Bengaluru",
     description: "Good Coffee. Good Food. Good Vibes.",
   },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
   robots: { index: true, follow: true },
 };
 

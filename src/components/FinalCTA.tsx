@@ -8,6 +8,7 @@ import { SITE, NAV_LINKS } from "@/lib/site";
 import { EASE, RevealLines, useCalm } from "@/components/ui/motion";
 import { Bloom, Grain, Steam, Vignette } from "@/components/ui/Atmosphere";
 import CoffeeParticles from "@/components/ui/CoffeeParticles";
+import { LogoMark } from "@/components/ui/Logo";
 
 /**
  * FINAL — Come for the Coffee. Stay for the Vibe.
@@ -128,10 +129,15 @@ export default function FinalCTA() {
         <div className="mx-auto max-w-[1400px] px-6 py-14 md:px-12">
           <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
             <div>
-              <p className="font-display text-xl tracking-[0.14em] text-cream">
-                {SITE.nameShort}
-              </p>
-              <p className="font-kannada mt-2 text-xs text-mist/50">{SITE.nameKannada}</p>
+              <div className="flex items-center gap-3">
+                <LogoMark className="h-9 w-9 text-amber" />
+                <div>
+                  <p className="font-display text-xl tracking-[0.14em] text-cream">
+                    {SITE.nameShort}
+                  </p>
+                  <p className="font-kannada mt-0.5 text-xs text-mist/50">{SITE.nameKannada}</p>
+                </div>
+              </div>
               <p className="mt-4 max-w-xs text-sm text-linen/55">{SITE.tagline}</p>
             </div>
 
@@ -158,13 +164,33 @@ export default function FinalCTA() {
                 <br />
                 {SITE.address.line4}
               </p>
-              <a
-                href={SITE.phoneHref}
-                className="mt-4 block text-sm text-linen/80 transition-colors hover:text-amber"
-              >
-                {SITE.phone}
-              </a>
-              <p className="mt-1 text-xs text-mist/45">{SITE.hours}</p>
+              <div className="mt-4 flex flex-col gap-1 text-sm text-linen/80">
+                <a href={SITE.phoneHref} className="transition-colors hover:text-amber">
+                  📞 {SITE.phone}
+                </a>
+                <a href={SITE.emailHref} className="transition-colors hover:text-amber">
+                  ✉️ {SITE.email}
+                </a>
+                <div className="mt-1 flex flex-wrap gap-x-3 text-xs text-caramel">
+                  <a
+                    href={SITE.instagramHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 transition-colors hover:text-cream"
+                  >
+                    {SITE.instagram} ↗
+                  </a>
+                  <a
+                    href={SITE.instagramOfficialHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 transition-colors hover:text-cream"
+                  >
+                    {SITE.instagramOfficial} ↗
+                  </a>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-mist/45">{SITE.hours}</p>
             </address>
           </div>
 
@@ -172,12 +198,24 @@ export default function FinalCTA() {
             <p className="text-xs text-mist/40">
               © {new Date().getFullYear()} Amaia&rsquo;s Coffee House · BTM Layout, Bengaluru
             </p>
-            <a
-              href="#top"
-              className="text-xs text-mist/50 transition-colors hover:text-amber"
-            >
-              Back to top ↑
-            </a>
+            <div className="flex items-center gap-4 text-xs text-mist/40">
+              <a
+                href={SITE.creator.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-amber"
+                title="Website designed & built by Pari Gowda"
+              >
+                Crafted by <span className="text-linen/70 underline decoration-caramel/40 underline-offset-4 hover:text-amber font-medium">{SITE.creator.name}</span>
+              </a>
+              <span className="h-3 w-px bg-linen/15" />
+              <a
+                href="#top"
+                className="transition-colors hover:text-amber"
+              >
+                Back to top ↑
+              </a>
+            </div>
           </div>
         </div>
       </div>

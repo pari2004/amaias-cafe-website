@@ -82,18 +82,12 @@ function Frame({
     [first ? 1 : 0, 1, 1, last ? 1 : 0]
   );
   const scale = useTransform(progress, [lo, hi], calm ? [1, 1] : [1.18, 0.96]);
-  const y = useTransform(progress, [lo, hi], calm ? ["0%", "0%"] : ["8%", "-8%"]);
-  const blur = useTransform(
-    progress,
-    [lo, inA, inB, hi],
-    calm ? [0, 0, 0, 0] : [first ? 0 : 14, 0, 0, last ? 0 : 14]
-  );
-  const filter = useTransform(blur, (v) => `blur(${v}px)`);
+  const y = useTransform(progress, [lo, hi], calm ? ["0%", "0%"] : ["6%", "-6%"]);
 
   return (
     <motion.div
       className="absolute inset-0 will-change-transform"
-      style={{ opacity, filter }}
+      style={{ opacity }}
       aria-hidden={index !== 0}
     >
       <motion.div className="absolute inset-0" style={{ scale, y }}>
@@ -147,7 +141,7 @@ export default function CoffeeExperience() {
             <p className="eyebrow mb-5">The Coffee</p>
             <h2 className="display-md font-display text-cream">
               <RevealLines
-                lines={[<>Crafted for Every</>, <><em className="not-italic text-caramel">Coffee</em> Moment.</>]}
+                lines={[<>Crafted for Every </>, <><em className="not-italic text-caramel">Coffee</em> Moment.</>]}
               />
             </h2>
 

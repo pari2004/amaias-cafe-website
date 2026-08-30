@@ -78,7 +78,7 @@ export default function Reviews() {
               <p className="eyebrow mb-6">Reviews</p>
             </Reveal>
             <h2 className="display-md font-display text-cream">
-              <RevealLines lines={[<>Loved by</>, <><em className="not-italic text-caramel">Coffee</em> Lovers.</>]} />
+              <RevealLines lines={[<>Loved by </>, <><em className="not-italic text-caramel">Coffee</em> Lovers.</>]} />
             </h2>
 
             <motion.div

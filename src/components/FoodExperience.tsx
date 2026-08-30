@@ -148,7 +148,7 @@ export default function FoodExperience() {
             </Reveal>
             <h2 className="display-lg font-display text-cream">
               <RevealLines
-                lines={[<>Coffee Deserves</>, <>Good <em className="not-italic text-caramel">Company.</em></>]}
+                lines={[<>Coffee Deserves </>, <>Good <em className="not-italic text-caramel">Company.</em></>]}
               />
             </h2>
           </div>

@@ -37,10 +37,9 @@ export default function Hero() {
   const flat = (a: number, b: number) => (calm ? [a, a] : [a, b]);
 
   // Ground: scales up and sinks as you leave.
-  const bgScale = useTransform(p, [0, 1], flat(1.04, 1.32));
-  const bgY = useTransform(p, [0, 1], calm ? ["0%", "0%"] : ["0%", "9%"]);
-  const bgBlur = useTransform(p, [0, 1], flat(0, 9));
-  const bgFilter = useTransform(bgBlur, (v) => `blur(${v}px) brightness(${1 - v * 0.045})`);
+  const bgScale = useTransform(p, [0, 1], flat(1.04, 1.25));
+  const bgY = useTransform(p, [0, 1], calm ? ["0%", "0%"] : ["0%", "8%"]);
+  const bgOpacity = useTransform(p, [0, 0.8], [1, 0.85]);
 
   // Swirl counter-rotates against the ground.
   const swirlRotate = useTransform(p, [0, 1], flat(0, -55));
@@ -68,7 +67,7 @@ export default function Hero() {
         {/* ---------- Layer 1 · roast ground ---------- */}
         <motion.div
           className="absolute inset-0 will-change-transform"
-          style={{ scale: bgScale, y: bgY, filter: bgFilter }}
+          style={{ scale: bgScale, y: bgY, opacity: bgOpacity }}
         >
           <div
             className="absolute inset-0"

@@ -19,6 +19,8 @@ import { Bloom, Grain, Steam } from "@/components/ui/Atmosphere";
 const DETAILS = [
   { k: "Address", v: [SITE.address.line1, SITE.address.line2, SITE.address.line3, SITE.address.line4] },
   { k: "Phone", v: [SITE.phone] },
+  { k: "Email", v: [SITE.email], href: SITE.emailHref },
+  { k: "Instagram", v: [SITE.instagram, SITE.instagramOfficial], links: [{ label: SITE.instagram, href: SITE.instagramHref }, { label: SITE.instagramOfficial, href: SITE.instagramOfficialHref }] },
   { k: "Hours", v: [SITE.hours] },
   { k: "Per Person", v: [SITE.price] },
 ];
@@ -52,7 +54,7 @@ export default function Visit() {
               <p className="eyebrow mb-5">Visit Us</p>
             </Reveal>
             <h2 className="display-lg font-display text-cream">
-              <RevealLines lines={[<>Your Coffee Break</>, <>Starts <em className="not-italic text-caramel">Here.</em></>]} />
+              <RevealLines lines={[<>Your Coffee Break </>, <>Starts <em className="not-italic text-caramel">Here.</em></>]} />
             </h2>
 
             <Reveal delay={0.25}>
@@ -80,7 +82,30 @@ export default function Visit() {
                     {d.k.toUpperCase()}
                   </dt>
                   <dd className="col-span-2 text-sm leading-relaxed text-linen/85 md:text-base">
-                    {d.k === "Phone" ? (
+                    {"links" in d && d.links ? (
+                      <div className="flex flex-wrap gap-x-4 gap-y-1">
+                        {d.links.map((link) => (
+                          <a
+                            key={link.label}
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 transition-colors hover:text-amber"
+                          >
+                            {link.label} ↗
+                          </a>
+                        ))}
+                      </div>
+                    ) : "href" in d && d.href ? (
+                      <a
+                        href={d.href}
+                        target={d.href.startsWith("http") ? "_blank" : undefined}
+                        rel={d.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                        className="inline-flex items-center gap-1.5 transition-colors hover:text-amber"
+                      >
+                        {d.v[0]} {d.href.startsWith("http") ? "↗" : ""}
+                      </a>
+                    ) : d.k === "Phone" ? (
                       <a
                         href={SITE.phoneHref}
                         className="transition-colors hover:text-amber"
@@ -97,7 +122,7 @@ export default function Visit() {
             </dl>
 
             <Reveal delay={0.2}>
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
+              <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                 <a
                   href={SITE.directions}
                   target="_blank"
@@ -106,6 +131,19 @@ export default function Visit() {
                 >
                   <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/70 to-transparent transition-transform duration-[900ms] group-hover:translate-x-full" />
                   <span className="relative">Get Directions</span>
+                </a>
+                <a
+                  href={SITE.instagramHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-linen/25 px-8 py-4 text-center text-sm font-medium text-cream transition-all duration-500 hover:border-linen/55 hover:bg-cream/[0.06] hover:text-amber"
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                  </svg>
+                  Instagram
                 </a>
                 <a
                   href={SITE.phoneHref}
